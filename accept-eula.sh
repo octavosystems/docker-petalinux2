@@ -2,13 +2,27 @@
 # SPDX-FileCopyrightText: 2021, Carles Fernandez-Prades <carles.fernandez@cttc.es>
 # SPDX-License-Identifier: MIT
 set timeout -1
-set install_dir [lindex $argv 1]
-set installer [lindex $argv 0]
 
-spawn $installer $install_dir
+# installer is the first argv element; other argv elements are passed-through
+set installer [lindex $argv 0]
+set argc [llength $argv]
+# assume the install directory is the last argument if present
+if {$argc >= 2} {
+    set install_dir [lindex $argv [expr {$argc - 1}]]
+} else {
+    set install_dir ""
+}
+
+# forward all provided args to the installer (handles flags like --dir <path>)
+spawn $installer {*}$argv
 set timeout 2
 expect {
-    "ERROR: Invalid options:" {spawn $installer -d $install_dir }
+    "ERROR: Invalid options:" {
+        # try legacy short option if installer rejected the arguments
+        if {$install_dir != ""} {
+            spawn $installer -d $install_dir
+        }
+    }
     timeout { }
 }
 

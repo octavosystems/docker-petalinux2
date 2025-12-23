@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021-2023, Carles Fernandez-Prades <carles.fernandez@cttc.es>
 # SPDX-License-Identifier: MIT
 
-FROM ubuntu:18.04
+FROM --platform=linux/amd64 ubuntu:24.04
 
 LABEL version="3.0" description="Geniux builder" maintainer="carles.fernandez@cttc.es"
 
@@ -9,8 +9,9 @@ LABEL version="3.0" description="Geniux builder" maintainer="carles.fernandez@ct
 # or "docker build --build-arg PETA_VERSION=2021.2 --build-arg PETA_RUN_FILE=petalinux-v2021.2-final-installer.run --build-arg VIVADO_INSTALLER=Xilinx_Unified_2021.2_1021_0703.tar.gz -t docker_petalinux2:2021.2 ."
 
 # Install dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y -q \
   autoconf \
+  automake \
   bc \
   bison \
   build-essential \
@@ -25,7 +26,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   expect \
   flex \
   fonts-droid-fallback \
-  fonts-ubuntu-font-family-console \
   gawk \
   gcc-multilib \
   git \
@@ -38,13 +38,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   lib32z1-dev \
   libbz2-dev \
   libcanberra-gtk-module \
-  libegl1-mesa \
+  libegl1-mesa-dev \
+  libegl-dev \
   libffi-dev \
   libgdbm-dev \
   libglib2.0-dev \
   libgtk2.0-0 \
   libjpeg62-dev \
-  libpython3.8-dev \
+  libpython3-dev \
   libncurses5-dev \
   libnss3-dev \
   libreadline-dev \
@@ -62,30 +63,31 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   net-tools \
   pax \
   pkg-config \
-  pylint3 \
-  python \
+  pylint \
   python3 \
   python3-pexpect \
   python3-pip \
   python3-git \
   python3-jinja2 \
+  python-is-python3 \
   rsync \
   screen \
   socat \
   sudo \
   texinfo \
-  tftpd \
+  tftpd-hpa \
   tofrodos \
-  ttf-ubuntu-font-family \
   u-boot-tools \
   ubuntu-gnome-default-settings \
   unzip \
   update-inetd \
   wget \
+  tar \
   xorg \
   xterm \
   xvfb \
   xxd \
+  xz-utils \
   zlib1g-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
@@ -108,7 +110,7 @@ RUN wget https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz \
 ARG UID
 ARG GID
 
-RUN groupadd --gid ${GID} petalinux_docker
+#RUN groupadd --gid ${GID} petalinux_docker
 
 RUN adduser --uid ${UID} --gid ${GID} --disabled-password --gecos '' petalinux && \
   usermod -aG sudo petalinux && \
@@ -122,7 +124,8 @@ ARG PETA_VERSION
 ARG PETA_RUN_FILE
 
 # The HTTP server to retrieve the files from.
-ARG HTTP_SERV=http://172.17.0.1:8000/installers
+# ARG HTTP_SERV=http://172.17.0.1:8000/installers
+ARG HTTP_SERV=http://host.docker.internal:8000/installers
 ARG VIVADO_UPDATE
 
 COPY accept-eula.sh /
@@ -144,7 +147,7 @@ RUN cd / && wget -q ${HTTP_SERV}/${PETA_RUN_FILE} && \
   mkdir -p /opt/Xilinx && \
   chmod 777 /tmp /opt/Xilinx && \
   cd /tmp && \
-  sudo -u petalinux -i /accept-eula.sh /${PETA_RUN_FILE} /opt/Xilinx/petalinux && \
+  sudo -u petalinux -i /accept-eula.sh /${PETA_RUN_FILE} --dir /opt/Xilinx/petalinux && \
   rm -f /${PETA_RUN_FILE} /accept-eula.sh
 
 ARG VIVADO_INSTALLER

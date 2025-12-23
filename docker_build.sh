@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: MIT
 
 # Default version 2021.2
-XILVER=${1:-2021.2}
+XILVER=${1:-2024.2}
 
 cd installers || exit
 
 # Check for Petalinux installer
-if [ "${XILVER}" == "2023.2" ] ; then
-	PLNX="petalinux-v${XILVER}-10121855-installer.run" # for Vivado 2023.2
+if [ "${XILVER}" == "2024.2" ] ; then
+	PLNX="petalinux-v${XILVER}-11062026-installer.run" # for 2024.2
 else
 	PLNX="petalinux-v${XILVER}-final-installer.run" # for Vivado 2021.2
 fi
