@@ -89,8 +89,9 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y -q \
   xxd \
   xz-utils \
   zlib1g-dev \
+  dnsutils \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* 
 
 RUN dpkg --add-architecture i386 && apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
