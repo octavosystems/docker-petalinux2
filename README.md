@@ -9,6 +9,7 @@ SPDX-FileCopyrightText: 2021-2023 Carles Fernandez-Prades <carles.fernandez@cttc
 <!-- prettier-ignore-end -->
 
 # docker-petalinux2
+**Warning: This fork is still under development and does not work as is. This README will be updated when a stable version of the repository is available**
 
 A somehow generic Xilinx PetaLinux & Vivado Docker image, using Ubuntu 18.04 as
 the base image.
